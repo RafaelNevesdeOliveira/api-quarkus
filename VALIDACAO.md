@@ -1,0 +1,3 @@
+# Validação de aluno-inicio — 3 de outubro de 2026
+
+Quarkus 3.40.1, Temurin JDK 25.0.2, Maven 3.9.9 e `maven.compiler.release=25` (bytecode Java 25). Comando executado: `mvn -o test package` com cache Maven local da tarefa. Scaffold inicial: nenhum teste foi definido ainda. O pacote JVM foi criado. Resultado: 0 testes, 0 falhas, 0 erros, 0 ignorados. O pacote JVM `target/quarkus-app/quarkus-run.jar` foi criado. Nenhum Docker, build nativo ou banco foi iniciado. A integração real com PostgreSQL ainda depende de validação em banco didático isolado.
