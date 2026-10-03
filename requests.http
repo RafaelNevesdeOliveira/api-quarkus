@@ -1,28 +1,13 @@
 @baseUrl = http://localhost:8081
 
-### 1. Cadastrar titular
-POST {{baseUrl}}/api/pessoas
+### Cadastro com senha apenas no request. Não usar senha real neste arquivo.
+POST {{baseUrl}}/api/usuarios
 Content-Type: application/json
 
-{"nome":"Pessoa Exemplo 2","cpf":"44455566677","email":"pessoa2@example.test"}
+{"nome":"Pessoa Exemplo","email":"usuario@example.test","senha":"SenhaFicticia123!"}
 
-### 2. Abrir conta. Ajuste os IDs ao banco didático.
-POST {{baseUrl}}/api/contas
-Content-Type: application/json
+### Resposta sem senha nem hash
+GET {{baseUrl}}/api/usuarios
 
-{"agencia":"0001","numero":"200001-9","saldoInicial":250.00,"ativa":true,"titularId":1,"tipoContaId":1}
-
-### 3. Consultar conta
+### As rotas de Pessoa e Conta do Dia 3 continuam disponíveis
 GET {{baseUrl}}/api/contas/1
-
-### 4. Depositar
-PATCH {{baseUrl}}/api/contas/1/depositos
-Content-Type: application/json
-
-{"valor":25.00}
-
-### 5. Saque maior que saldo: 409
-PATCH {{baseUrl}}/api/contas/1/saques
-Content-Type: application/json
-
-{"valor":999999.00}
