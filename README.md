@@ -24,3 +24,6 @@ Comando validado para gerar este scaffold:
 ```sh
 mvn io.quarkus.platform:quarkus-maven-plugin:3.40.1:create -DprojectGroupId=br.edu.fiap -DprojectArtifactId=agencia-bancaria-quarkus -DprojectVersion=1.0.0-SNAPSHOT -Dextensions=rest-jackson,hibernate-validator -DjavaVersion=25 -DnoCode
 ```
+
+O gerador cria exemplos em `src/main/docker` e `.dockerignore`. Eles foram
+removidos deste scaffold porque as aulas executam somente na JVM.
