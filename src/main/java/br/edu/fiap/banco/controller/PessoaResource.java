@@ -3,6 +3,7 @@ package br.edu.fiap.banco.controller;
 import br.edu.fiap.banco.dto.PessoaRequest;
 import br.edu.fiap.banco.dto.PessoaResponse;
 import br.edu.fiap.banco.service.PessoaService;
+import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -22,6 +23,9 @@ import java.net.URI;
 @Path("/api/pessoas")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+// @Authenticated exige JWT válido; no Spring Security, a regra
+// requestMatchers("/api/pessoas/**").authenticated() faria o mesmo.
+@Authenticated
 public class PessoaResource {
     private final PessoaService service;
 

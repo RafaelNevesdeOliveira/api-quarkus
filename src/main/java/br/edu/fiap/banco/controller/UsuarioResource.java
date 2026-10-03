@@ -3,6 +3,8 @@ package br.edu.fiap.banco.controller;
 import br.edu.fiap.banco.dto.UsuarioRequest;
 import br.edu.fiap.banco.dto.UsuarioResponse;
 import br.edu.fiap.banco.service.UsuarioService;
+import io.quarkus.security.Authenticated;
+import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -23,6 +25,9 @@ import java.util.List;
 @Path("/api/usuarios")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+// @Authenticated protege as leituras; Spring Security usaria uma regra
+// authenticated() para estas rotas no SecurityFilterChain.
+@Authenticated
 public class UsuarioResource {
     private final UsuarioService service;
 
@@ -35,7 +40,10 @@ public class UsuarioResource {
 
     // @NotNull/@Valid ativam Jakarta Bean Validation no request, assim
     // como @Valid @RequestBody em um controller Spring.
+    // @PermitAll libera o cadastro mesmo com a classe protegida; no
+    // Spring Security, requestMatchers(POST, "/api/usuarios").permitAll().
     @POST
+    @PermitAll
     public Response cadastrar(@NotNull @Valid UsuarioRequest pedido) {
         UsuarioResponse usuario = service.cadastrar(pedido);
         return Response.created(URI.create("/api/usuarios/" + usuario.id()))

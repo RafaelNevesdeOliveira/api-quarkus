@@ -1,13 +1,29 @@
 @baseUrl = http://localhost:8081
+@token = COLE_AQUI_O_ACCESS_TOKEN_DO_LOGIN
 
-### Cadastro com senha apenas no request. Não usar senha real neste arquivo.
+### Cadastro público. Use somente senha fictícia nesta demonstração.
 POST {{baseUrl}}/api/usuarios
 Content-Type: application/json
 
 {"nome":"Pessoa Exemplo","email":"usuario@example.test","senha":"SenhaFicticia123!"}
 
-### Resposta sem senha nem hash
-GET {{baseUrl}}/api/usuarios
+### Login público: copie accessToken da resposta para @token
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
 
-### As rotas de Pessoa e Conta do Dia 3 continuam disponíveis
+{"email":"usuario@example.test","senha":"SenhaFicticia123!"}
+
+### Protegido: identidade das claims sem consulta ao banco
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{token}}
+
+### Protegido: cadastro de pessoa
+POST {{baseUrl}}/api/pessoas
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"nome":"Titular Exemplo","cpf":"12345678901","email":"titular@example.test"}
+
+### Protegido: busca de conta
 GET {{baseUrl}}/api/contas/1
+Authorization: Bearer {{token}}

@@ -4,6 +4,7 @@ import br.edu.fiap.banco.dto.ContaBancariaRequest;
 import br.edu.fiap.banco.dto.ContaBancariaResponse;
 import br.edu.fiap.banco.dto.MovimentacaoRequest;
 import br.edu.fiap.banco.service.ContaBancariaService;
+import io.quarkus.security.Authenticated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -24,6 +25,9 @@ import java.util.List;
 @Path("/api/contas")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+// @Authenticated protege todas as rotas desta classe; no Spring Security,
+// uma regra authenticated() para /api/contas/** exerceria esse papel.
+@Authenticated
 public class ContaBancariaResource {
     private final ContaBancariaService service;
 
