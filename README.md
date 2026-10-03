@@ -22,5 +22,5 @@ Dia 1. Leia `README-BRANCHES.md` para a progressão das aulas.
 Comando validado para gerar este scaffold:
 
 ```sh
-mvn io.quarkus.platform:quarkus-maven-plugin:3.40.1:create -DprojectGroupId=br.edu.fiap -DprojectArtifactId=agencia-bancaria-quarkus -DprojectVersion=1.0.0-SNAPSHOT -Dextensions=rest-jackson,hibernate-validator -DnoCode
+mvn io.quarkus.platform:quarkus-maven-plugin:3.40.1:create -DprojectGroupId=br.edu.fiap -DprojectArtifactId=agencia-bancaria-quarkus -DprojectVersion=1.0.0-SNAPSHOT -Dextensions=rest-jackson,hibernate-validator -DjavaVersion=25 -DnoCode
 ```
