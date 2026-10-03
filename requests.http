@@ -4,13 +4,13 @@
 POST {{baseUrl}}/api/pessoas
 Content-Type: application/json
 
-{"nome":"Pessoa Exemplo","cpf":"12345678901","email":"pessoa@example.test"}
+{"nome":"Pessoa Exemplo","cpf":"44455566677","email":"pessoa@example.test"}
 
 ### Mesmo CPF: 409 na mesma execução
 POST {{baseUrl}}/api/pessoas
 Content-Type: application/json
 
-{"nome":"Pessoa Exemplo","cpf":"12345678901","email":"pessoa@example.test"}
+{"nome":"Pessoa Exemplo","cpf":"44455566677","email":"pessoa@example.test"}
 
 ### E-mail inválido: 400
 POST {{baseUrl}}/api/pessoas

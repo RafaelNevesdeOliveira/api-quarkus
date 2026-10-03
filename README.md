@@ -1,62 +1,45 @@
-# Agência Bancária em Quarkus — gabarito incremental do Dia 1
+# Agência Bancária em Quarkus — Dia 2, JDBC manual
 
-Reconstrução do cadastro de Pessoa do projeto Spring `projeto-agencia-bancaria-gabarito`.
-Este primeiro estágio usa memória para isolar REST, JSON, validação, CDI e camadas.
-Os dados se perdem ao reiniciar. PostgreSQL entra no Dia 2, em instância didática
-isolada; JPA, BCrypt e JWT entram depois.
+Cópia incremental do Dia 1. O contrato `POST /api/pessoas` e os DTOs permanecem;
+`PessoaRepositoryEmMemoria` foi substituído por `PessoaRepositoryJdbc`.
 
-## Stack validada
+## O que mudou
 
-- Quarkus 3.40.1, Maven 3.9.9 e Temurin JDK 17.0.18.
-- `quarkus-rest-jackson`, `quarkus-hibernate-validator`, `quarkus-arc`.
-- Testes: `quarkus-junit` e RestAssured.
-- Sem datasource, Dev Services, containers ou build nativo.
+`PessoaRepositoryJdbc` recebe um `DataSource`, abre `Connection`, prepara SQL com
+`?`, vincula parâmetros, lê o `ResultSet` e fecha recursos com try-with-resources.
+Usa `public.pessoas` do **mesmo** `sql/01_criar_tabelas.sql` da referência
+Spring. `INSERT ... RETURNING id` é sintaxe PostgreSQL. O SQLSTATE `23505`
+traduz a restrição UNIQUE de CPF em conflito 409, inclusive se duas chamadas
+passarem ao mesmo tempo pela checagem prévia do service.
 
-## Executar e empacotar em JVM
+No Spring original, `PessoaRepository extends JpaRepository` oferece `save`
+e `existsByCpf`; essa interface esconde SQL, conexão e mapeamento. O Dia 3
+mostrará essa abstração novamente com JPA no Quarkus. Quarkus não exige os
+pacotes `controller/service/repository`; mantemos a estrutura por clareza.
+
+## Banco didático isolado
+
+Crie um banco PostgreSQL **novo e isolado** para a aula. Não execute os scripts
+em banco real ou compartilhado. A ordem é `sql/01_criar_tabelas.sql` e, se
+quiser, `sql/02_carga_dados_sintetica.sql`. O esquema original contém também
+`tipos_conta`, `usuarios` e `contas_bancarias`; hoje a API acessa somente
+`pessoas`.
+
+Antes de iniciar a API, defina `DB_URL`, `DB_USER` e `DB_PASSWORD` para essa
+instância. O projeto não fornece credenciais nem inicia Dev Services ou Docker.
 
 ```sh
-java -version
-mvn -version
+export DB_URL='jdbc:postgresql://HOST_DIDATICO:5432/agencia_bancaria_didatica'
+export DB_USER='USUARIO_DIDATICO'
+export DB_PASSWORD='SENHA_DIDATICA'
 mvn quarkus:dev
 ```
 
-Em outro terminal, use `requests.http` ou um cliente HTTP. Para encerrar o modo
-dev, use Ctrl+C. Depois:
+A porta HTTP é 8081. `requests.http` contém exemplos de cadastro e erros.
 
-```sh
-mvn test package
-java -jar target/quarkus-app/quarkus-run.jar
-```
+## Verificação realizada
 
-O fast-jar precisa da pasta `target/quarkus-app` completa. A API usa a porta
-8081 para manter o endereço do projeto Spring original.
-
-## Contrato preservado
-
-`POST /api/pessoas` recebe `nome`, `cpf` (11 dígitos) e `email` válido.
-Devolve 201, `Location: /api/pessoas/{id}` e
-`PessoaResponse(id, nome, cpf, email)`. Entrada inválida devolve 400; CPF
-repetido devolve 409. `PessoaRequest` contém as mesmas anotações Jakarta de
-validação usadas no projeto Spring.
-
-## Onde está cada responsabilidade
-
-| Classe | Papel |
-|---|---|
-| `controller/PessoaResource` | HTTP e status; corresponde a `PessoaController` no Spring. |
-| `dto/PessoaRequest`, `PessoaResponse` | Contrato JSON de entrada e saída. |
-| `service/PessoaService` | Caso de uso e verificação de CPF único. |
-| `repository/PessoaRepository` | Fronteira para armazenamento; JDBC a implementará no Dia 2. |
-| `repository/PessoaRepositoryEmMemoria` | Implementação temporária com estrutura concorrente. |
-| `entity/Pessoa` | Modelo Java, ainda sem anotações JPA. |
-
-O Quarkus não impõe esses pacotes. A organização reproduz a separação de
-responsabilidades que os alunos já conhecem do projeto Spring. Em REST, o
-JSON de `PessoaResponse` é a representação entregue ao cliente; não há tela
-HTML na “View” deste exemplo.
-
-## Verificação executada
-
-`mvn test package` passou com quatro testes HTTP: cadastro 201 com Location,
-entrada inválida 400, corpo JSON nulo 400 e CPF duplicado 409. O teste inicia Quarkus localmente
-em perfil de teste, sem PostgreSQL e sem containers.
+`mvn test package` passou com **2 testes unitários** de `PessoaService`, usando
+um repository falso. O código JDBC e o empacotamento JVM compilaram, mas a
+conexão, os comandos SQL e os endpoints HTTP **não foram executados contra
+PostgreSQL** nesta tarefa. Nenhum banco ou container foi iniciado.
