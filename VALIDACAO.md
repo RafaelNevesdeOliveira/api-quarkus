@@ -1,7 +1,3 @@
-# Validação do Dia 2
+# Validação de dia-02 — 3 de outubro de 2026
 
-Quarkus 3.40.1, JDK 17.0.18, Maven 3.9.9. `mvn test package` passou com
-2 testes unitários, 0 falhas e 0 erros. O `quarkus-run.jar` JVM foi gerado.
-As variáveis `DB_URL`, `DB_USER` e `DB_PASSWORD` no build apontavam para valores
-fictícios; nenhuma conexão foi aberta. Não foram feitos testes de integração
-PostgreSQL nem testes HTTP neste estágio.
+Quarkus 3.40.1, Temurin JDK 25.0.2, Maven 3.9.9 e `maven.compiler.release=25` (bytecode Java 25). Comando executado: `mvn -o test package` com cache Maven local da tarefa. Passaram 2 testes unitários; não houve conexão PostgreSQL. Resultado: 2 testes, 0 falhas, 0 erros, 0 ignorados. O pacote JVM `target/quarkus-app/quarkus-run.jar` foi criado. Nenhum Docker, build nativo ou banco foi iniciado. A integração real com PostgreSQL ainda depende de validação em banco didático isolado.
