@@ -1,45 +1,43 @@
-# Agência Bancária em Quarkus — Dia 2, JDBC manual
+# Agência Bancária em Quarkus — Dia 3, JPA e contas
 
-Cópia incremental do Dia 1. O contrato `POST /api/pessoas` e os DTOs permanecem;
-`PessoaRepositoryEmMemoria` foi substituído por `PessoaRepositoryJdbc`.
+Cópia incremental dos dias 1 e 2. Preserva o esquema PostgreSQL original em
+`sql/01_criar_tabelas.sql`. JDBC manual saiu da implementação; as entidades
+Jakarta Persistence e repositories Panache assumem a persistência. A entidade
+`ContaBancaria` e seus DTOs foram trazidos do domínio bancário Spring.
 
-## O que mudou
+## Comparação com o projeto Spring
 
-`PessoaRepositoryJdbc` recebe um `DataSource`, abre `Connection`, prepara SQL com
-`?`, vincula parâmetros, lê o `ResultSet` e fecha recursos com try-with-resources.
-Usa `public.pessoas` do **mesmo** `sql/01_criar_tabelas.sql` da referência
-Spring. `INSERT ... RETURNING id` é sintaxe PostgreSQL. O SQLSTATE `23505`
-traduz a restrição UNIQUE de CPF em conflito 409, inclusive se duas chamadas
-passarem ao mesmo tempo pela checagem prévia do service.
+`JpaRepository<Pessoa, Long>` do Spring oferecia `save` e consultas derivadas.
+Aqui, `PessoaRepositoryJpa` usa `PanacheRepository<Pessoa>`, `persistAndFlush`
+e `count("cpf", cpf)`. O service conserva uma fronteira `PessoaRepository`.
+`@Transactional` abre a unidade de trabalho; a entidade muda o saldo e o
+Hibernate grava a alteração no commit. `@ManyToOne` associa conta a Pessoa e
+TipoConta. O JSON de `ContaBancariaResponse` é plano para evitar expor proxies
+ou ciclos.
 
-No Spring original, `PessoaRepository extends JpaRepository` oferece `save`
-e `existsByCpf`; essa interface esconde SQL, conexão e mapeamento. O Dia 3
-mostrará essa abstração novamente com JPA no Quarkus. Quarkus não exige os
-pacotes `controller/service/repository`; mantemos a estrutura por clareza.
+## Rotas desta etapa
+
+- `POST /api/pessoas` cadastra titular.
+- `POST /api/contas` abre conta com titular e tipo existentes.
+- `GET /api/contas/{id}` e `GET /api/contas/pessoa/{pessoaId}` consultam.
+- `PATCH /api/contas/{id}/depositos` e `/saques` usam regras da entidade.
+
+O service coordena, mas `ContaBancaria` recusa movimentação não positiva, conta
+inativa e saque acima do saldo. O esquema SQL impõe saldo não negativo e
+unicidade de agência+número.
 
 ## Banco didático isolado
 
-Crie um banco PostgreSQL **novo e isolado** para a aula. Não execute os scripts
-em banco real ou compartilhado. A ordem é `sql/01_criar_tabelas.sql` e, se
-quiser, `sql/02_carga_dados_sintetica.sql`. O esquema original contém também
-`tipos_conta`, `usuarios` e `contas_bancarias`; hoje a API acessa somente
-`pessoas`.
-
-Antes de iniciar a API, defina `DB_URL`, `DB_USER` e `DB_PASSWORD` para essa
-instância. O projeto não fornece credenciais nem inicia Dev Services ou Docker.
-
-```sh
-export DB_URL='jdbc:postgresql://HOST_DIDATICO:5432/agencia_bancaria_didatica'
-export DB_USER='USUARIO_DIDATICO'
-export DB_PASSWORD='SENHA_DIDATICA'
-mvn quarkus:dev
-```
-
-A porta HTTP é 8081. `requests.http` contém exemplos de cadastro e erros.
+Execute o esquema somente numa instância PostgreSQL de aula isolada. As
+variáveis `DB_URL`, `DB_USER` e `DB_PASSWORD` são obrigatórias. Não foram
+incluídas senhas reais. Dev Services está desabilitado e
+`quarkus.hibernate-orm.schema-management.strategy=none` impede que a aplicação
+crie ou altere tabelas. A carga sintética é opcional; ela cria uma Pessoa, um
+TipoConta e uma conta para exercícios. Não aponte para banco compartilhado.
 
 ## Verificação realizada
 
-`mvn test package` passou com **2 testes unitários** de `PessoaService`, usando
-um repository falso. O código JDBC e o empacotamento JVM compilaram, mas a
-conexão, os comandos SQL e os endpoints HTTP **não foram executados contra
-PostgreSQL** nesta tarefa. Nenhum banco ou container foi iniciado.
+Quarkus 3.40.1, JDK 17 e Maven 3.9.9: `mvn test package` passou com **4 testes
+unitários** de `ContaBancaria`. O build JVM foi gerado. Sem PostgreSQL nesta
+tarefa, ainda não foram executados testes HTTP ou de integração JPA, nem
+verificado o mapeamento contra uma instância real.

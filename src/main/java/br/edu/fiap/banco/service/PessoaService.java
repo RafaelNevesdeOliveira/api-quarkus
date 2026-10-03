@@ -7,6 +7,7 @@ import br.edu.fiap.banco.exception.CpfJaCadastradoException;
 import br.edu.fiap.banco.repository.PessoaRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
 /**
  * Caso de uso: cadastrar um titular sem duplicar CPF.
@@ -24,11 +25,14 @@ public class PessoaService {
         this.repository = repository;
     }
 
+    // Jakarta @Transactional mantém o INSERT JPA em uma transação;
+    // Spring usa @Transactional do pacote org.springframework.transaction.
+    @Transactional
     public PessoaResponse cadastrar(PessoaRequest request) {
         if (repository.existePorCpf(request.cpf())) {
             throw new CpfJaCadastradoException();
         }
-        Pessoa pessoa = new Pessoa(null, request.nome(), request.cpf(), request.email());
+        Pessoa pessoa = new Pessoa(request.nome(), request.cpf(), request.email());
         return PessoaResponse.de(repository.salvar(pessoa));
     }
 }

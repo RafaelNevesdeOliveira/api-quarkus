@@ -1,19 +1,28 @@
 @baseUrl = http://localhost:8081
 
-### Cadastro aceito: 201 e Location
+### 1. Cadastrar titular
 POST {{baseUrl}}/api/pessoas
 Content-Type: application/json
 
-{"nome":"Pessoa Exemplo","cpf":"44455566677","email":"pessoa@example.test"}
+{"nome":"Pessoa Exemplo 2","cpf":"44455566677","email":"pessoa2@example.test"}
 
-### Mesmo CPF: 409 na mesma execução
-POST {{baseUrl}}/api/pessoas
+### 2. Abrir conta. Ajuste os IDs ao banco didático.
+POST {{baseUrl}}/api/contas
 Content-Type: application/json
 
-{"nome":"Pessoa Exemplo","cpf":"44455566677","email":"pessoa@example.test"}
+{"agencia":"0001","numero":"200001-9","saldoInicial":250.00,"ativa":true,"titularId":1,"tipoContaId":1}
 
-### E-mail inválido: 400
-POST {{baseUrl}}/api/pessoas
+### 3. Consultar conta
+GET {{baseUrl}}/api/contas/1
+
+### 4. Depositar
+PATCH {{baseUrl}}/api/contas/1/depositos
 Content-Type: application/json
 
-{"nome":"Pessoa Exemplo","cpf":"98765432109","email":"invalido"}
+{"valor":25.00}
+
+### 5. Saque maior que saldo: 409
+PATCH {{baseUrl}}/api/contas/1/saques
+Content-Type: application/json
+
+{"valor":999999.00}
