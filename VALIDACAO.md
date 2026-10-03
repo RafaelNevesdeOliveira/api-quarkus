@@ -1,7 +1,3 @@
-# Validação do Dia 4
+# Validação de dia-04 — 3 de outubro de 2026
 
-`mvn test package` com Quarkus 3.40.1/JDK 17.0.18/Maven 3.9.9:
-6 testes unitários, 0 falhas, 0 erros; pacote JVM criado. Testes executaram
-BCrypt via BcryptUtil e Argon2id via Bouncy Castle 1.86, ambos com senhas
-fictícias. Não foi iniciada conexão PostgreSQL, container ou serviço HTTP.
-O cadastro JPA de usuário compila, mas ainda não foi testado contra banco.
+Quarkus 3.40.1, Temurin JDK 25.0.2, Maven 3.9.9 e `maven.compiler.release=25` (bytecode Java 25). Comando executado: `mvn -o test package` com cache Maven local da tarefa. Passaram 6 testes unitários de domínio e senhas; não houve conexão PostgreSQL. Resultado: 6 testes, 0 falhas, 0 erros, 0 ignorados. O pacote JVM `target/quarkus-app/quarkus-run.jar` foi criado. Nenhum Docker, build nativo ou banco foi iniciado. A integração real com PostgreSQL ainda depende de validação em banco didático isolado.

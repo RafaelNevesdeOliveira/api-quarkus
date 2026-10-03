@@ -1,5 +1,19 @@
 # Agência Bancária em Quarkus — Dia 4, senhas
 
+## Ambiente JDK 25.0.2 e JVM
+
+Use Temurin JDK 25.0.2 para compilar, testar e executar este projeto. O `pom.xml` define `maven.compiler.release=25`: o bytecode gerado exige Java 25. No macOS, selecione o JDK antes do Maven:
+
+```sh
+export JAVA_HOME=$(/usr/libexec/java_home -v 25.0.2)
+export PATH="$JAVA_HOME/bin:$PATH"
+java -version
+javac -version
+mvn -version
+```
+
+Para desenvolver, use `mvn quarkus:dev`. Para criar e executar o pacote JVM, use `mvn test package` e `java -jar target/quarkus-app/quarkus-run.jar` com a pasta `target/quarkus-app` inteira. O curso não usa Docker nem compilação nativa.
+
 Cópia incremental do Dia 3. O domínio `Usuario` foi trazido do projeto Spring,
 separado de `Pessoa`: titular bancário e identidade de acesso têm papéis
 diferentes. `POST /api/usuarios` recebe a senha apenas no request. O service
@@ -32,7 +46,7 @@ Nenhum DDL foi alterado neste estágio.
 
 ## Verificação realizada
 
-Quarkus 3.40.1, JDK 17, Maven 3.9.9: `mvn test package` passou com **6 testes
+Quarkus 3.40.1, JDK 25.0.2, Maven 3.9.9: `mvn test package` passou com **6 testes
 unitários**. Dois testam BCrypt/Argon2 com dados fictícios; quatro cobrem
 regras de saldo. O build JVM compila cadastro, DTO e JPA. PostgreSQL, rotas
 HTTP de usuário e gravação do hash não foram executados. Nenhum container foi
